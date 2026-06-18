@@ -1,0 +1,1756 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LeadForge AI — AI Sales Agent for Web Developers</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+      colors: {
+        brand: { 50:'#f0f7ff', 100:'#e0efff', 500:'#3b82f6', 600:'#2563eb', 700:'#1d4ed8', 900:'#1e3a8a' },
+        emerald: { 400:'#34d399', 500:'#10b981' },
+        violet: { 400:'#a78bfa', 500:'#8b5cf6', 600:'#7c3aed' },
+        amber: { 400:'#fbbf24', 500:'#f59e0b' },
+        rose: { 400:'#fb7185', 500:'#f43f5e' }
+      }
+    }
+  }
+}
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0f;
+  --bg2:#111118;
+  --bg3:#16161f;
+  --border:#1e1e2e;
+  --text:#e8e8f0;
+  --muted:#6b6b80;
+  --blue:#3b82f6;
+  --violet:#8b5cf6;
+  --emerald:#10b981;
+  --amber:#f59e0b;
+  --rose:#f43f5e;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* Glass cards */
+.glass{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);backdrop-filter:blur(12px);border-radius:16px}
+.glass-dark{background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(20px);border-radius:16px}
+
+/* Gradient blobs */
+.blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:0.15;pointer-events:none;animation:blobFloat 8s ease-in-out infinite}
+.blob-1{width:600px;height:600px;background:radial-gradient(circle,#3b82f6,#8b5cf6);top:-200px;left:-100px}
+.blob-2{width:500px;height:500px;background:radial-gradient(circle,#10b981,#3b82f6);bottom:100px;right:-150px;animation-delay:-4s}
+.blob-3{width:400px;height:400px;background:radial-gradient(circle,#8b5cf6,#f43f5e);top:50%;left:40%;animation-delay:-2s}
+@keyframes blobFloat{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(20px,-20px) scale(1.05)}}
+
+/* Gradient text */
+.grad-text{background:linear-gradient(135deg,#60a5fa,#a78bfa,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.grad-blue{background:linear-gradient(135deg,#3b82f6,#8b5cf6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+/* Glow effects */
+.glow-blue{box-shadow:0 0 30px rgba(59,130,246,0.3)}
+.glow-violet{box-shadow:0 0 30px rgba(139,92,246,0.3)}
+.glow-emerald{box-shadow:0 0 30px rgba(16,185,129,0.3)}
+
+/* Buttons */
+.btn-primary{background:linear-gradient(135deg,#3b82f6,#8b5cf6);color:#fff;border:none;padding:12px 24px;border-radius:12px;font-weight:600;cursor:pointer;transition:all 0.2s;font-size:14px}
+.btn-primary:hover{opacity:0.9;transform:translateY(-1px);box-shadow:0 8px 25px rgba(59,130,246,0.4)}
+.btn-secondary{background:transparent;color:var(--text);border:1px solid rgba(255,255,255,0.1);padding:12px 24px;border-radius:12px;font-weight:500;cursor:pointer;transition:all 0.2s;font-size:14px}
+.btn-secondary:hover{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.2)}
+.btn-sm{padding:8px 16px;font-size:13px;border-radius:8px}
+.btn-icon{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px;transition:all 0.2s}
+.btn-icon:hover{background:rgba(255,255,255,0.1)}
+
+/* Inputs */
+.input-field{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--text);padding:12px 16px;border-radius:12px;width:100%;font-size:14px;outline:none;transition:border-color 0.2s;font-family:'Inter',sans-serif}
+.input-field:focus{border-color:rgba(59,130,246,0.6);background:rgba(59,130,246,0.05)}
+.input-field::placeholder{color:var(--muted)}
+select.input-field option{background:#1a1a2e;color:var(--text)}
+
+/* Badges */
+.badge{padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.badge-hot{background:rgba(244,63,94,0.2);color:#fb7185;border:1px solid rgba(244,63,94,0.3)}
+.badge-warm{background:rgba(245,158,11,0.2);color:#fbbf24;border:1px solid rgba(245,158,11,0.3)}
+.badge-cold{background:rgba(59,130,246,0.2);color:#93c5fd;border:1px solid rgba(59,130,246,0.3)}
+.badge-green{background:rgba(16,185,129,0.2);color:#34d399;border:1px solid rgba(16,185,129,0.3)}
+.badge-violet{background:rgba(139,92,246,0.2);color:#a78bfa;border:1px solid rgba(139,92,246,0.3)}
+
+/* Progress bars */
+.progress-bar{height:6px;border-radius:3px;background:rgba(255,255,255,0.08);overflow:hidden}
+.progress-fill{height:100%;border-radius:3px;transition:width 1s ease}
+.fill-blue{background:linear-gradient(90deg,#3b82f6,#8b5cf6)}
+.fill-green{background:linear-gradient(90deg,#10b981,#34d399)}
+.fill-amber{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+.fill-rose{background:linear-gradient(90deg,#f43f5e,#fb7185)}
+
+/* Tabs */
+.tab-btn{padding:8px 20px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;border:none;color:var(--muted);background:transparent}
+.tab-btn.active{background:rgba(59,130,246,0.2);color:#60a5fa;border:1px solid rgba(59,130,246,0.3)}
+.tab-btn:hover:not(.active){color:var(--text)}
+
+/* Modal */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal-box{background:var(--bg2);border:1px solid rgba(255,255,255,0.1);border-radius:24px;padding:40px;max-width:520px;width:100%;max-height:90vh;overflow-y:auto}
+
+/* Nav */
+nav{position:sticky;top:0;z-index:100;background:rgba(10,10,15,0.8);backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,0.06)}
+
+/* Section titles */
+.section-eyebrow{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--blue);margin-bottom:12px}
+
+/* Kanban */
+.kanban-col{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:14px;padding:16px;min-width:180px;min-height:300px}
+.kanban-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px;margin-bottom:10px;cursor:grab;transition:all 0.2s}
+.kanban-card:hover{background:rgba(255,255,255,0.07);transform:translateY(-2px)}
+.kanban-card.dragging{opacity:0.5;transform:scale(0.95)}
+.kanban-col.drag-over{border-color:rgba(59,130,246,0.5);background:rgba(59,130,246,0.05)}
+
+/* Timeline */
+.timeline-line{position:absolute;left:20px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,#3b82f6,#8b5cf6,#10b981)}
+.timeline-dot{width:12px;height:12px;border-radius:50%;position:absolute;left:15px;transform:translateX(0)}
+
+/* Score circles */
+.score-ring{transform:rotate(-90deg)}
+
+/* Animated counter */
+.counter{display:inline-block;font-variant-numeric:tabular-nums}
+
+/* Status dot */
+.status-dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot-green{background:#10b981;box-shadow:0 0 8px #10b981}
+.dot-red{background:#f43f5e;box-shadow:0 0 8px #f43f5e}
+.dot-amber{background:#f59e0b;box-shadow:0 0 8px #f59e0b}
+
+/* Sidebar */
+.sidebar{width:240px;background:var(--bg2);border-right:1px solid var(--border);min-height:100vh;position:fixed;top:0;left:0;padding:20px 16px;z-index:50;transform:translateX(0);transition:transform 0.3s}
+.sidebar-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;font-size:13px;font-weight:500;color:var(--muted);transition:all 0.2s;margin-bottom:2px}
+.sidebar-item:hover{background:rgba(255,255,255,0.05);color:var(--text)}
+.sidebar-item.active{background:rgba(59,130,246,0.15);color:#60a5fa;border:1px solid rgba(59,130,246,0.2)}
+.main-content{margin-left:240px}
+
+/* Slider */
+input[type=range]{-webkit-appearance:none;appearance:none;background:transparent;cursor:pointer;width:100%}
+input[type=range]::-webkit-slider-track{background:rgba(255,255,255,0.1);height:6px;border-radius:3px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:50%;margin-top:-7px;box-shadow:0 0 10px rgba(59,130,246,0.5)}
+input[type=range]::-moz-range-track{background:rgba(255,255,255,0.1);height:6px;border-radius:3px}
+input[type=range]::-moz-range-thumb{width:20px;height:20px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:50%;border:none}
+input[type=checkbox]{accent-color:#3b82f6}
+
+/* Chart bars */
+.chart-bar{background:linear-gradient(180deg,#3b82f6,rgba(59,130,246,0.2));border-radius:4px 4px 0 0;transition:height 0.8s ease;position:relative}
+.chart-bar:hover::after{content:attr(data-val);position:absolute;top:-24px;left:50%;transform:translateX(-50%);font-size:11px;color:#60a5fa;white-space:nowrap}
+
+/* Notification */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid rgba(16,185,129,0.3);border-radius:12px;padding:14px 20px;z-index:2000;transform:translateY(100px);opacity:0;transition:all 0.3s;display:flex;align-items:center;gap:10px}
+.toast.show{transform:translateY(0);opacity:1}
+
+@media(max-width:768px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main-content{margin-left:0}
+  .blob{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     ONBOARDING MODAL
+     ============================================================ -->
+<div id="onboardingModal" class="modal-backdrop" style="display:none">
+  <div class="modal-box">
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <div class="section-eyebrow">Setup</div>
+        <h2 class="text-2xl font-bold grad-text" id="stepTitle">Welcome to LeadForge AI</h2>
+      </div>
+      <div class="flex gap-1" id="stepDots"></div>
+    </div>
+    <div id="stepIndicator" class="text-xs text-gray-500 mb-6"></div>
+
+    <!-- Step 1: Personal Details -->
+    <div id="step1" class="step-panel">
+      <p class="text-sm text-gray-400 mb-6">Let's personalize your AI sales agent. This helps generate authentic outreach messages.</p>
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs font-medium text-gray-400 mb-2 block">Full Name</label>
+          <input id="ob_name" class="input-field" type="text" placeholder="Arjun Sharma" value="Arjun Sharma"/>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-400 mb-2 block">Business / Freelance Name</label>
+          <input id="ob_biz" class="input-field" type="text" placeholder="Arjun Dev Studio" value="Arjun Dev Studio"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Channels -->
+    <div id="step2" class="step-panel" style="display:none">
+      <p class="text-sm text-gray-400 mb-6">Connect your outreach channels. The AI will use these to send personalized messages.</p>
+      <div class="space-y-4">
+        <div class="glass p-4 rounded-xl">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <div style="width:36px;height:36px;background:linear-gradient(135deg,#25d366,#128c7e);border-radius:10px;display:flex;align-items:center;justify-content:center">
+                <svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M11.999 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.985-1.424A9.96 9.96 0 0012 22c5.522 0 10-4.478 10-10S17.521 2 12 2z" fill-rule="evenodd" clip-rule="evenodd"/></svg>
+              </div>
+              <div>
+                <div class="text-sm font-semibold">WhatsApp</div>
+                <div class="text-xs text-gray-500">Business Messaging</div>
+              </div>
+            </div>
+            <span id="wa_status" class="badge badge-green">Connected</span>
+          </div>
+          <input id="ob_whatsapp" class="input-field" type="tel" placeholder="+91 98765 43210" value="+91 98765 43210"/>
+        </div>
+        <div class="glass p-4 rounded-xl">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <div style="width:36px;height:36px;background:linear-gradient(135deg,#ea4335,#fbbc05);border-radius:10px;display:flex;align-items:center;justify-content:center">
+                <svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+              </div>
+              <div>
+                <div class="text-sm font-semibold">Gmail</div>
+                <div class="text-xs text-gray-500">Email Outreach</div>
+              </div>
+            </div>
+            <span id="gmail_status" class="badge badge-green">Connected</span>
+          </div>
+          <input id="ob_gmail" class="input-field" type="email" placeholder="arjun@gmail.com" value="arjun.devstudio@gmail.com"/>
+        </div>
+        <div class="glass p-4 rounded-xl">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <div style="width:36px;height:36px;background:linear-gradient(135deg,#e1306c,#fd1d1d,#fcb045);border-radius:10px;display:flex;align-items:center;justify-content:center">
+                <svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+              </div>
+              <div>
+                <div class="text-sm font-semibold">Instagram</div>
+                <div class="text-xs text-gray-500">DM Outreach</div>
+              </div>
+            </div>
+            <span id="ig_status" class="badge badge-warm">Not Connected</span>
+          </div>
+          <input id="ob_instagram" class="input-field" type="text" placeholder="@arjundevs" value="@arjun.devstudio"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Portfolio -->
+    <div id="step3" class="step-panel" style="display:none">
+      <p class="text-sm text-gray-400 mb-6">Your portfolio is auto-included in every outreach message to build instant trust.</p>
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs font-medium text-gray-400 mb-2 block">Portfolio Website URL</label>
+          <input id="ob_portfolio" class="input-field" type="url" placeholder="https://yourportfolio.com" value="https://chrollo1754.github.io/portf/"/>
+        </div>
+        <div class="glass p-4 rounded-xl mt-2">
+          <div class="text-xs text-gray-400 mb-1">Preview</div>
+          <a id="portfolioPreviewLink" href="https://chrollo1754.github.io/portf/" target="_blank" class="text-sm text-blue-400 hover:underline">https://chrollo1754.github.io/portf/</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Pricing -->
+    <div id="step4" class="step-panel" style="display:none">
+      <p class="text-sm text-gray-400 mb-6">Set your service pricing. The AI uses this to estimate project value and craft better proposals.</p>
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs font-medium text-gray-400 mb-2 block">Basic Website <span class="text-gray-600">(5-page static)</span></label>
+          <input id="ob_basic" class="input-field" type="text" placeholder="₹8,000" value="₹8,000"/>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-400 mb-2 block">Business Website <span class="text-gray-600">(CMS + booking)</span></label>
+          <input id="ob_business" class="input-field" type="text" placeholder="₹22,000" value="₹22,000"/>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-400 mb-2 block">Premium Website <span class="text-gray-600">(custom + integrations)</span></label>
+          <input id="ob_premium" class="input-field" type="text" placeholder="₹55,000" value="₹55,000"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5: Campaign Defaults -->
+    <div id="step5" class="step-panel" style="display:none">
+      <p class="text-sm text-gray-400 mb-6">Set your default campaign parameters. You can override these per campaign.</p>
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs font-medium text-gray-400 mb-2 block">Target Area / City</label>
+          <input id="ob_area" class="input-field" type="text" placeholder="Mumbai, Maharashtra" value="Mumbai, Maharashtra"/>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-400 mb-2 block">Daily Outreach Limit</label>
+          <div class="flex items-center gap-4">
+            <input id="ob_daily" type="range" min="5" max="50" step="5" value="30" style="flex:1"/>
+            <span id="ob_daily_val" class="text-blue-400 font-bold text-lg w-10 text-right">30</span>
+          </div>
+          <div class="flex justify-between text-xs text-gray-600 mt-1"><span>5</span><span>50</span></div>
+        </div>
+        <div class="glass p-4 rounded-xl" style="background:rgba(59,130,246,0.05);border-color:rgba(59,130,246,0.2)">
+          <div class="text-xs text-blue-400 font-semibold mb-1">🚀 Projected Monthly</div>
+          <div class="text-sm text-gray-300">~<span id="ob_proj_leads">900</span> businesses reached → <span id="ob_proj_rev">₹1,98,000</span> potential revenue</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-between mt-8">
+      <button id="prevBtn" class="btn-secondary btn-sm" onclick="prevStep()" style="visibility:hidden">← Back</button>
+      <button id="nextBtn" class="btn-primary btn-sm" onclick="nextStep()">Continue →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast">
+  <span class="text-emerald-400">✓</span>
+  <span id="toastMsg">Copied to clipboard!</span>
+</div>
+
+<!-- ============================================================
+     SIDEBAR NAVIGATION
+     ============================================================ -->
+<div id="sidebar" class="sidebar" style="padding-top:80px">
+  <div class="text-xs font-semibold text-gray-600 uppercase tracking-widest mb-3 px-3">Campaign</div>
+  <div class="sidebar-item active" onclick="showSection('hero')">
+    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M13 3L4 14h7l-2 7 9-11h-7l2-7z"/></svg>
+    Campaign Setup
+  </div>
+  <div class="sidebar-item" onclick="showSection('settings')">
+    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6zm7.07-3c.04.33.07.66.07 1s-.03.67-.07 1l2.13 1.66c.2.16.24.43.12.65l-2 3.46c-.12.22-.39.3-.61.22l-2.52-1.01c-.52.4-1.08.73-1.7.98l-.38 2.67c-.04.24-.25.42-.5.42h-4c-.25 0-.46-.18-.5-.42l-.38-2.67a7.96 7.96 0 01-1.7-.98l-2.52 1.01c-.22.08-.49 0-.61-.22l-2-3.46c-.12-.22-.08-.49.12-.65L4.93 13c-.04-.33-.07-.67-.07-1s.03-.67.07-1L2.8 9.34c-.2-.16-.24-.43-.12-.65l2-3.46c.12-.22.39-.3.61-.22l2.52 1.01c.52-.4 1.08-.73 1.7-.98L9.9 2.37c.04-.24.25-.42.5-.42h4c.25 0 .46.18.5.42l.38 2.67c.62.25 1.18.58 1.7.98l2.52-1.01c.22-.08.49 0 .61.22l2 3.46c.12.22.08.49-.12.65L19.07 12z"/></svg>
+    Settings
+  </div>
+  <div class="sidebar-item" onclick="showSection('accounts')">
+    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+    Accounts
+  </div>
+  <div class="text-xs font-semibold text-gray-600 uppercase tracking-widest mb-3 mt-6 px-3">Intelligence</div>
+  <div class="sidebar-item" onclick="showSection('discovery')">
+    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    Lead Discovery
+  </div>
+  <div class="sidebar-item" onclick="showSection('audit')">
+    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0116 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 019.5 16 6.5 6.5 0 013 9.5 6.5 6.5 0 019.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5z"/></svg>
+    Website Audit
+  </div>
+  <div class="sidebar-item" onclick="showSection('pricing')">
+    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+    AI Pricing
+  </div>
+  <div class="text-xs font-semibold text-gray-600 uppercase tracking-widest mb-3 mt-6 px-3">Outreach</div>
+  <div class="sidebar-item" onclick="showSection('outreach')">
+    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+    Message Generator
+  </div>
+  <div class="sidebar-item" onclick="showSection('followup')">
+    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+    Follow-Up Engine
+  </div>
+  <div class="text-xs font-semibold text-gray-600 uppercase tracking-widest mb-3 mt-6 px-3">Management</div>
+  <div class="sidebar-item" onclick="showSection('crm')">
+    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+    CRM Pipeline
+  </div>
+  <div class="sidebar-item" onclick="showSection('analytics')">
+    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/></svg>
+    Analytics
+  </div>
+  <div class="sidebar-item" onclick="showSection('forecast')">
+    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99l1.5 1.5z"/></svg>
+    Forecast
+  </div>
+  <div class="sidebar-item" onclick="showSection('proposal')">
+    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6zm-1 1.5L18.5 9H13V3.5zM6 20V4h5v7h7v9H6z"/></svg>
+    Proposals
+  </div>
+</div>
+
+<!-- ============================================================
+     TOP NAV
+     ============================================================ -->
+<nav>
+  <div class="flex items-center justify-between px-6 py-4" style="margin-left:240px">
+    <div class="flex items-center gap-4">
+      <button class="text-gray-500 md:hidden" onclick="document.getElementById('sidebar').classList.toggle('open')">
+        <svg width="22" height="22" fill="currentColor" viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      </button>
+      <div class="flex items-center gap-2">
+        <div style="width:32px;height:32px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:8px;display:flex;align-items:center;justify-content:center">
+          <svg width="16" height="16" fill="white" viewBox="0 0 24 24"><path d="M13 3L4 14h7l-2 7 9-11h-7l2-7z"/></svg>
+        </div>
+        <span class="font-bold text-base">LeadForge <span class="grad-text">AI</span></span>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <div class="flex items-center gap-2 glass px-3 py-2 rounded-xl" style="font-size:12px">
+        <span class="status-dot dot-green"></span>
+        <span class="text-gray-300">Campaign Active</span>
+      </div>
+      <div class="glass px-3 py-2 rounded-xl text-xs text-gray-400">
+        🇮🇳 Mumbai
+      </div>
+      <button class="btn-primary btn-sm" onclick="showSection('hero')">+ New Campaign</button>
+      <button class="btn-icon" onclick="showOnboarding()">⚙</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     MAIN CONTENT WRAPPER
+     ============================================================ -->
+<div class="main-content" style="min-height:100vh;padding-bottom:80px">
+
+<!-- ============================================================
+     SECTION 2: HERO
+     ============================================================ -->
+<section id="heroSection" class="section-panel relative overflow-hidden" style="padding:60px 40px 80px">
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+  <div class="relative z-10">
+    <div class="section-eyebrow">🤖 AI-Powered Sales Automation</div>
+    <h1 class="text-5xl font-black mb-4 leading-tight" style="max-width:700px">
+      AI Finds Clients<br><span class="grad-text">While You Sleep</span>
+    </h1>
+    <p class="text-lg text-gray-400 mb-10" style="max-width:550px">Find local businesses that need websites, generate personalized outreach, automate follow-ups, and close more deals — fully autonomous.</p>
+
+    <!-- Campaign Input Card -->
+    <div class="glass p-8 rounded-2xl" style="max-width:680px;background:rgba(255,255,255,0.03)">
+      <div class="grid gap-5" style="grid-template-columns:1fr 1fr">
+        <div>
+          <label class="text-xs font-medium text-gray-400 mb-2 block">Target Industry</label>
+          <select id="heroIndustry" class="input-field">
+            <option value="restaurants">🍽 Restaurants & Cafes</option>
+            <option value="salons">💇 Salons & Spas</option>
+            <option value="dental">🦷 Dental Clinics</option>
+            <option value="gyms">💪 Gyms & Fitness</option>
+            <option value="retail">🛍 Retail Stores</option>
+            <option value="real_estate">🏠 Real Estate</option>
+            <option value="lawyers">⚖ Law Firms</option>
+            <option value="clinics">🏥 Medical Clinics</option>
+            <option value="hotels">🏨 Hotels & Guesthouses</option>
+            <option value="coaching">📚 Coaching Centers</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-400 mb-2 block">Target Location</label>
+          <input id="heroLocation" class="input-field" type="text" placeholder="Mumbai, Maharashtra" value="Mumbai, Maharashtra"/>
+        </div>
+      </div>
+      <div class="mt-5">
+        <label class="text-xs font-medium text-gray-400 mb-3 block">Daily Outreach Frequency</label>
+        <input id="heroSlider" type="range" min="0" max="5" step="1" value="4" oninput="updateSlider(this.value)"/>
+        <div class="flex justify-between text-xs text-gray-600 mt-1">
+          <span>5</span><span>10</span><span>15</span><span>20</span><span>30</span><span>50</span>
+        </div>
+        <div class="glass mt-4 px-4 py-3 rounded-xl flex items-center gap-3" style="background:rgba(59,130,246,0.08);border-color:rgba(59,130,246,0.25)">
+          <div style="width:8px;height:8px;border-radius:50%;background:#3b82f6;animation:pulse 2s infinite"></div>
+          <span class="text-sm text-gray-300">AI will contact <span id="sliderVal" class="text-blue-400 font-bold">30</span> businesses per day — projected <span id="sliderMonthly" class="text-emerald-400 font-bold">₹66,000/month</span></span>
+        </div>
+      </div>
+      <div class="flex gap-3 mt-6">
+        <button class="btn-primary" style="flex:1;padding:14px" onclick="startCampaign()">
+          <span style="font-size:15px">⚡ Start Campaign</span>
+        </button>
+        <button class="btn-secondary" onclick="showDemo()">▶ Watch Demo</button>
+      </div>
+    </div>
+
+    <!-- Live Stats Row -->
+    <div class="grid mt-10 gap-4" style="max-width:680px;grid-template-columns:repeat(4,1fr)">
+      <div class="glass p-4 rounded-xl text-center">
+        <div class="text-2xl font-black grad-text counter" data-target="2847">0</div>
+        <div class="text-xs text-gray-500 mt-1">Leads Found</div>
+      </div>
+      <div class="glass p-4 rounded-xl text-center">
+        <div class="text-2xl font-black" style="color:#10b981" id="statMessages">1,293</div>
+        <div class="text-xs text-gray-500 mt-1">Msgs Sent</div>
+      </div>
+      <div class="glass p-4 rounded-xl text-center">
+        <div class="text-2xl font-black" style="color:#f59e0b">47</div>
+        <div class="text-xs text-gray-500 mt-1">Meetings</div>
+      </div>
+      <div class="glass p-4 rounded-xl text-center">
+        <div class="text-2xl font-black" style="color:#8b5cf6">₹8.4L</div>
+        <div class="text-xs text-gray-500 mt-1">Revenue</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 3: CAMPAIGN SETTINGS
+     ============================================================ -->
+<section id="settingsSection" class="section-panel" style="display:none;padding:40px">
+  <div class="section-eyebrow">⚙ Configuration</div>
+  <h2 class="text-3xl font-bold mb-8">Campaign Settings</h2>
+  <div class="grid gap-6" style="grid-template-columns:1fr 1fr;max-width:900px">
+    <div class="glass p-6 rounded-2xl">
+      <h3 class="font-semibold mb-4 text-sm">Targeting</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs text-gray-400 mb-1 block">Industry</label>
+          <select class="input-field">
+            <option>🍽 Restaurants & Cafes</option>
+            <option>💇 Salons & Spas</option>
+            <option>🦷 Dental Clinics</option>
+            <option>💪 Gyms & Fitness</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-gray-400 mb-1 block">Location</label>
+          <input class="input-field" type="text" value="Mumbai, Maharashtra"/>
+        </div>
+        <div>
+          <label class="text-xs text-gray-400 mb-1 block">Campaign Duration</label>
+          <div class="flex gap-2">
+            <button class="btn-sm tab-btn active">7 Days</button>
+            <button class="btn-sm tab-btn" onclick="selectTab(this)">14 Days</button>
+            <button class="btn-sm tab-btn" onclick="selectTab(this)">30 Days</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="glass p-6 rounded-2xl">
+      <h3 class="font-semibold mb-4 text-sm">Outreach Channels</h3>
+      <div class="space-y-3">
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" checked class="w-4 h-4"/>
+          <div style="width:28px;height:28px;background:linear-gradient(135deg,#25d366,#128c7e);border-radius:8px;display:flex;align-items:center;justify-content:center">
+            <svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.985-1.424A9.96 9.96 0 0012 22c5.522 0 10-4.478 10-10S17.521 2 12 2z"/></svg>
+          </div>
+          <span class="text-sm">WhatsApp</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" checked class="w-4 h-4"/>
+          <div style="width:28px;height:28px;background:linear-gradient(135deg,#ea4335,#fbbc05);border-radius:8px;display:flex;align-items:center;justify-content:center">
+            <svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          </div>
+          <span class="text-sm">Gmail / Email</span>
+        </label>
+        <label class="flex items-center gap-3 cursor-pointer">
+          <input type="checkbox" class="w-4 h-4"/>
+          <div style="width:28px;height:28px;background:linear-gradient(135deg,#e1306c,#fd1d1d,#fcb045);border-radius:8px;display:flex;align-items:center;justify-content:center">
+            <svg width="14" height="14" fill="white" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+          </div>
+          <span class="text-sm">Instagram DMs</span>
+        </label>
+      </div>
+      <div class="mt-5">
+        <label class="text-xs text-gray-400 mb-2 block">Personalization Level</label>
+        <div class="flex gap-2">
+          <button class="btn-sm tab-btn" onclick="selectTab(this)">Standard</button>
+          <button class="btn-sm tab-btn active">Smart</button>
+          <button class="btn-sm tab-btn" onclick="selectTab(this)">Hyper-AI</button>
+        </div>
+      </div>
+      <div class="mt-4">
+        <label class="text-xs text-gray-400 mb-2 block">Follow-Up Schedule</label>
+        <div class="flex gap-2">
+          <button class="btn-sm tab-btn active">3 Days</button>
+          <button class="btn-sm tab-btn" onclick="selectTab(this)">7 Days</button>
+          <button class="btn-sm tab-btn" onclick="selectTab(this)">14 Days</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="btn-primary mt-6" onclick="startCampaign()">⚡ Launch Campaign</button>
+</section>
+
+<!-- ============================================================
+     SECTION 4: CONNECTED ACCOUNTS
+     ============================================================ -->
+<section id="accountsSection" class="section-panel" style="display:none;padding:40px">
+  <div class="section-eyebrow">🔗 Integrations</div>
+  <h2 class="text-3xl font-bold mb-8">Connected Accounts</h2>
+  <div class="grid gap-5" style="grid-template-columns:repeat(3,1fr);max-width:900px">
+    <div class="glass p-6 rounded-2xl glow-emerald">
+      <div class="flex items-center justify-between mb-5">
+        <div style="width:48px;height:48px;background:linear-gradient(135deg,#25d366,#128c7e);border-radius:14px;display:flex;align-items:center;justify-content:center">
+          <svg width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.985-1.424A9.96 9.96 0 0012 22c5.522 0 10-4.478 10-10S17.521 2 12 2z"/></svg>
+        </div>
+        <span class="flex items-center gap-1.5 text-xs"><span class="status-dot dot-green"></span>Connected</span>
+      </div>
+      <div class="font-bold mb-1">WhatsApp Business</div>
+      <div class="text-xs text-gray-400 mb-4">+91 98765 43210</div>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="glass p-3 rounded-xl text-center">
+          <div class="text-lg font-bold text-emerald-400">847</div>
+          <div class="text-xs text-gray-500">Msgs Sent</div>
+        </div>
+        <div class="glass p-3 rounded-xl text-center">
+          <div class="text-lg font-bold text-blue-400">2h ago</div>
+          <div class="text-xs text-gray-500">Last Active</div>
+        </div>
+      </div>
+    </div>
+    <div class="glass p-6 rounded-2xl glow-blue">
+      <div class="flex items-center justify-between mb-5">
+        <div style="width:48px;height:48px;background:linear-gradient(135deg,#ea4335,#fbbc05);border-radius:14px;display:flex;align-items:center;justify-content:center">
+          <svg width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        </div>
+        <span class="flex items-center gap-1.5 text-xs"><span class="status-dot dot-green"></span>Connected</span>
+      </div>
+      <div class="font-bold mb-1">Gmail</div>
+      <div class="text-xs text-gray-400 mb-4">arjun.devstudio@gmail.com</div>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="glass p-3 rounded-xl text-center">
+          <div class="text-lg font-bold text-blue-400">312</div>
+          <div class="text-xs text-gray-500">Emails Sent</div>
+        </div>
+        <div class="glass p-3 rounded-xl text-center">
+          <div class="text-lg font-bold text-amber-400">5h ago</div>
+          <div class="text-xs text-gray-500">Last Active</div>
+        </div>
+      </div>
+    </div>
+    <div class="glass p-6 rounded-2xl" style="border-color:rgba(225,48,108,0.3)">
+      <div class="flex items-center justify-between mb-5">
+        <div style="width:48px;height:48px;background:linear-gradient(135deg,#e1306c,#fd1d1d);border-radius:14px;display:flex;align-items:center;justify-content:center">
+          <svg width="24" height="24" fill="white" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069z"/><path d="M12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </div>
+        <span class="flex items-center gap-1.5 text-xs"><span class="status-dot dot-amber"></span>Not Connected</span>
+      </div>
+      <div class="font-bold mb-1">Instagram</div>
+      <div class="text-xs text-gray-400 mb-4">@arjun.devstudio</div>
+      <button class="btn-primary btn-sm w-full">Connect Instagram</button>
+      <div class="text-xs text-gray-600 mt-2 text-center">134 DMs queued</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 5: BUSINESS DISCOVERY
+     ============================================================ -->
+<section id="discoverySection" class="section-panel" style="display:none;padding:40px">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <div class="section-eyebrow">🔍 AI Discovery</div>
+      <h2 class="text-3xl font-bold">Business Discovery Engine</h2>
+    </div>
+    <div class="flex gap-3">
+      <select class="input-field" style="width:auto;padding:8px 12px;font-size:13px">
+        <option>All Leads</option>
+        <option>Hot Leads</option>
+        <option>Warm Leads</option>
+        <option>Cold Leads</option>
+      </select>
+      <button class="btn-primary btn-sm" onclick="refreshLeads()">🔄 Scan More</button>
+    </div>
+  </div>
+  <div id="leadsGrid" class="grid gap-4" style="grid-template-columns:repeat(auto-fill,minmax(320px,1fr))"></div>
+</section>
+
+<!-- ============================================================
+     SECTION 6: WEBSITE AUDIT
+     ============================================================ -->
+<section id="auditSection" class="section-panel" style="display:none;padding:40px">
+  <div class="section-eyebrow">🔬 AI Analysis</div>
+  <h2 class="text-3xl font-bold mb-8">AI Website Audit</h2>
+  <div id="auditCards" class="grid gap-5" style="grid-template-columns:repeat(auto-fill,minmax(380px,1fr))"></div>
+</section>
+
+<!-- ============================================================
+     SECTION 7 & 8: PRICING ENGINE
+     ============================================================ -->
+<section id="pricingSection" class="section-panel" style="display:none;padding:40px">
+  <div class="section-eyebrow">💰 Market Intelligence</div>
+  <h2 class="text-3xl font-bold mb-2">AI Pricing Engine</h2>
+  <p class="text-gray-400 mb-8">Mumbai local market rates — calibrated to business type and competition.</p>
+  <div class="grid gap-5" style="grid-template-columns:repeat(3,1fr);max-width:900px">
+    <div class="glass p-6 rounded-2xl" style="border-color:rgba(59,130,246,0.3)">
+      <div class="text-xs font-bold text-blue-400 mb-1 uppercase tracking-wider">Basic Website</div>
+      <div class="text-3xl font-black mb-1">₹8K–15K</div>
+      <div class="text-xs text-gray-500 mb-4">5-page static site</div>
+      <div class="space-y-2 text-xs text-gray-400">
+        <div>✓ Responsive design</div>
+        <div>✓ Contact form</div>
+        <div>✓ Google Maps embed</div>
+        <div>✓ SEO basics</div>
+      </div>
+      <div class="mt-4 text-xs text-gray-500">Confidence: <span class="text-blue-400 font-semibold">92%</span></div>
+    </div>
+    <div class="glass p-6 rounded-2xl glow-violet" style="border-color:rgba(139,92,246,0.4);transform:scale(1.02)">
+      <div class="text-xs font-bold text-violet-400 mb-1 uppercase tracking-wider">Business Website ⭐</div>
+      <div class="text-3xl font-black mb-1">₹15K–30K</div>
+      <div class="text-xs text-gray-500 mb-4">CMS + booking + leads</div>
+      <div class="space-y-2 text-xs text-gray-400">
+        <div>✓ Everything in Basic</div>
+        <div>✓ Online booking system</div>
+        <div>✓ WhatsApp chat widget</div>
+        <div>✓ Blog / CMS</div>
+        <div>✓ Lead capture forms</div>
+      </div>
+      <div class="mt-4 text-xs text-gray-500">Confidence: <span class="text-violet-400 font-semibold">97%</span></div>
+    </div>
+    <div class="glass p-6 rounded-2xl" style="border-color:rgba(245,158,11,0.3)">
+      <div class="text-xs font-bold text-amber-400 mb-1 uppercase tracking-wider">Premium Website</div>
+      <div class="text-3xl font-black mb-1">₹30K–75K</div>
+      <div class="text-xs text-gray-500 mb-4">Custom + integrations</div>
+      <div class="space-y-2 text-xs text-gray-400">
+        <div>✓ Everything in Business</div>
+        <div>✓ Payment gateway</div>
+        <div>✓ CRM integration</div>
+        <div>✓ Custom animations</div>
+        <div>✓ Analytics dashboard</div>
+      </div>
+      <div class="mt-4 text-xs text-gray-500">Confidence: <span class="text-amber-400 font-semibold">88%</span></div>
+    </div>
+  </div>
+  <!-- Bar Chart -->
+  <div class="glass p-6 rounded-2xl mt-6" style="max-width:900px">
+    <div class="flex items-end justify-around" style="height:150px;gap:8px">
+      <div class="flex flex-col items-center gap-2" style="flex:1">
+        <div class="chart-bar w-full" style="height:60%;background:linear-gradient(180deg,#3b82f6,rgba(59,130,246,0.2))" data-val="₹8-15K"></div>
+        <div class="text-xs text-gray-500">Basic</div>
+      </div>
+      <div class="flex flex-col items-center gap-2" style="flex:1">
+        <div class="chart-bar w-full" style="height:80%;background:linear-gradient(180deg,#8b5cf6,rgba(139,92,246,0.2))" data-val="₹15-30K"></div>
+        <div class="text-xs text-gray-500">Business</div>
+      </div>
+      <div class="flex flex-col items-center gap-2" style="flex:1">
+        <div class="chart-bar w-full" style="height:100%;background:linear-gradient(180deg,#f59e0b,rgba(245,158,11,0.2))" data-val="₹30-75K"></div>
+        <div class="text-xs text-gray-500">Premium</div>
+      </div>
+      <div class="flex flex-col items-center gap-2" style="flex:1">
+        <div class="chart-bar w-full" style="height:72%;background:linear-gradient(180deg,#10b981,rgba(16,185,129,0.2))" data-val="₹22K avg"></div>
+        <div class="text-xs text-gray-500">Avg Deal</div>
+      </div>
+    </div>
+    <div class="text-xs text-gray-500 text-center mt-3">Mumbai local market pricing benchmark — Q1 2025</div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 9: OUTREACH GENERATOR
+     ============================================================ -->
+<section id="outreachSection" class="section-panel" style="display:none;padding:40px">
+  <div class="section-eyebrow">✉ AI Copywriter</div>
+  <h2 class="text-3xl font-bold mb-2">AI Outreach Generator</h2>
+  <p class="text-gray-400 mb-6">Hyper-personalized messages for each lead using business name, industry, and detected problems.</p>
+
+  <!-- Lead Selector -->
+  <div class="flex gap-3 mb-6 flex-wrap">
+    <select id="outreachLeadSelect" class="input-field" style="width:280px" onchange="renderOutreach()">
+    </select>
+    <div class="flex gap-2" id="channelTabs">
+      <button class="tab-btn active" onclick="switchChannel('whatsapp',this)">📱 WhatsApp</button>
+      <button class="tab-btn" onclick="switchChannel('instagram',this)">📸 Instagram</button>
+      <button class="tab-btn" onclick="switchChannel('email',this)">📧 Email</button>
+    </div>
+  </div>
+
+  <div id="outreachMessages" class="space-y-4" style="max-width:800px"></div>
+</section>
+
+<!-- ============================================================
+     SECTION 10: FOLLOW-UP TIMELINE
+     ============================================================ -->
+<section id="followupSection" class="section-panel" style="display:none;padding:40px">
+  <div class="section-eyebrow">🕐 Automation</div>
+  <h2 class="text-3xl font-bold mb-8">Auto Follow-Up Engine</h2>
+  <div style="max-width:700px">
+    <div class="relative pl-14">
+      <div class="timeline-line"></div>
+      <div id="timelineItems"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 11: CRM PIPELINE
+     ============================================================ -->
+<section id="crmSection" class="section-panel" style="display:none;padding:40px">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <div class="section-eyebrow">📋 CRM</div>
+      <h2 class="text-3xl font-bold">Sales Pipeline</h2>
+    </div>
+    <div class="text-xs text-gray-500">Drag & drop cards between stages</div>
+  </div>
+  <div id="kanbanBoard" class="flex gap-4 overflow-x-auto pb-4" style="min-height:500px"></div>
+</section>
+
+<!-- ============================================================
+     SECTION 12: COMPETITOR ANALYSIS
+     ============================================================ -->
+<section id="competitorSection" class="section-panel" style="display:none;padding:40px">
+  <div class="section-eyebrow">🏆 Intelligence</div>
+  <h2 class="text-3xl font-bold mb-8">Competitor Analysis</h2>
+  <div id="competitorCards" class="grid gap-5" style="grid-template-columns:repeat(auto-fill,minmax(380px,1fr))"></div>
+</section>
+
+<!-- ============================================================
+     SECTION 13: PROPOSAL GENERATOR
+     ============================================================ -->
+<section id="proposalSection" class="section-panel" style="display:none;padding:40px">
+  <div class="section-eyebrow">📄 AI Generator</div>
+  <h2 class="text-3xl font-bold mb-6">Proposal Generator</h2>
+  <div class="grid gap-6" style="grid-template-columns:1fr 1fr;max-width:1000px;align-items:start">
+    <div class="glass p-6 rounded-2xl">
+      <h3 class="font-semibold mb-4">Proposal Config</h3>
+      <div class="space-y-4">
+        <div>
+          <label class="text-xs text-gray-400 mb-1 block">Client Business</label>
+          <select id="proposalClient" class="input-field" onchange="renderProposal()"></select>
+        </div>
+        <div>
+          <label class="text-xs text-gray-400 mb-1 block">Package Type</label>
+          <select id="proposalPackage" class="input-field" onchange="renderProposal()">
+            <option value="basic">Basic Website — ₹8,000</option>
+            <option value="business" selected>Business Website — ₹22,000</option>
+            <option value="premium">Premium Website — ₹55,000</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-gray-400 mb-1 block">Timeline</label>
+          <select id="proposalTimeline" class="input-field" onchange="renderProposal()">
+            <option value="1">1 Week</option>
+            <option value="2" selected>2 Weeks</option>
+            <option value="3">3 Weeks</option>
+            <option value="4">1 Month</option>
+          </select>
+        </div>
+        <button class="btn-primary w-full" onclick="exportProposal()">📥 Export PDF</button>
+      </div>
+    </div>
+    <div id="proposalPreview" class="glass p-6 rounded-2xl" style="font-size:13px;line-height:1.7"></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 14: ANALYTICS
+     ============================================================ -->
+<section id="analyticsSection" class="section-panel" style="display:none;padding:40px">
+  <div class="section-eyebrow">📊 Performance</div>
+  <h2 class="text-3xl font-bold mb-8">Analytics Dashboard</h2>
+  <div class="grid gap-4 mb-8" style="grid-template-columns:repeat(4,1fr)">
+    <div class="glass p-5 rounded-2xl">
+      <div class="text-xs text-gray-400 mb-1">Leads Found</div>
+      <div class="text-3xl font-black grad-text counter" data-target="2847">0</div>
+      <div class="text-xs text-emerald-400 mt-1">+127 this week</div>
+    </div>
+    <div class="glass p-5 rounded-2xl">
+      <div class="text-xs text-gray-400 mb-1">Messages Generated</div>
+      <div class="text-3xl font-black" style="color:#3b82f6" id="an2">1,293</div>
+      <div class="text-xs text-emerald-400 mt-1">+84 today</div>
+    </div>
+    <div class="glass p-5 rounded-2xl">
+      <div class="text-xs text-gray-400 mb-1">Replies Received</div>
+      <div class="text-3xl font-black" style="color:#10b981">247</div>
+      <div class="text-xs text-gray-500 mt-1">19.1% reply rate</div>
+    </div>
+    <div class="glass p-5 rounded-2xl">
+      <div class="text-xs text-gray-400 mb-1">Meetings Booked</div>
+      <div class="text-3xl font-black" style="color:#f59e0b">47</div>
+      <div class="text-xs text-gray-500 mt-1">19% meeting rate</div>
+    </div>
+    <div class="glass p-5 rounded-2xl">
+      <div class="text-xs text-gray-400 mb-1">Msgs Scheduled</div>
+      <div class="text-3xl font-black" style="color:#8b5cf6">30</div>
+      <div class="text-xs text-gray-500 mt-1">Today</div>
+    </div>
+    <div class="glass p-5 rounded-2xl">
+      <div class="text-xs text-gray-400 mb-1">Clients Closed</div>
+      <div class="text-3xl font-black" style="color:#fb7185">12</div>
+      <div class="text-xs text-emerald-400 mt-1">25.5% close rate</div>
+    </div>
+    <div class="glass p-5 rounded-2xl">
+      <div class="text-xs text-gray-400 mb-1">Revenue Potential</div>
+      <div class="text-3xl font-black" style="color:#fbbf24">₹8.4L</div>
+      <div class="text-xs text-emerald-400 mt-1">+₹44K this week</div>
+    </div>
+    <div class="glass p-5 rounded-2xl">
+      <div class="text-xs text-gray-400 mb-1">Conversion Rate</div>
+      <div class="text-3xl font-black grad-text">4.2%</div>
+      <div class="text-xs text-gray-500 mt-1">Industry avg: 2.1%</div>
+    </div>
+  </div>
+  <!-- Weekly chart -->
+  <div class="glass p-6 rounded-2xl" style="max-width:900px">
+    <div class="text-sm font-semibold mb-4">Weekly Outreach Volume</div>
+    <div class="flex items-end gap-3" style="height:120px">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <div class="chart-bar w-full" style="height:40%;background:linear-gradient(180deg,#3b82f6,rgba(59,130,246,0.1))" data-val="Mon: 18"></div>
+        <span class="text-xs text-gray-600">Mon</span>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <div class="chart-bar w-full" style="height:65%;background:linear-gradient(180deg,#3b82f6,rgba(59,130,246,0.1))" data-val="Tue: 28"></div>
+        <span class="text-xs text-gray-600">Tue</span>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <div class="chart-bar w-full" style="height:80%;background:linear-gradient(180deg,#8b5cf6,rgba(139,92,246,0.1))" data-val="Wed: 30"></div>
+        <span class="text-xs text-gray-600">Wed</span>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <div class="chart-bar w-full" style="height:70%;background:linear-gradient(180deg,#3b82f6,rgba(59,130,246,0.1))" data-val="Thu: 26"></div>
+        <span class="text-xs text-gray-600">Thu</span>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <div class="chart-bar w-full" style="height:90%;background:linear-gradient(180deg,#10b981,rgba(16,185,129,0.1))" data-val="Fri: 30"></div>
+        <span class="text-xs text-gray-600">Fri</span>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <div class="chart-bar w-full" style="height:50%;background:linear-gradient(180deg,#f59e0b,rgba(245,158,11,0.1))" data-val="Sat: 20"></div>
+        <span class="text-xs text-gray-600">Sat</span>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px">
+        <div class="chart-bar w-full" style="height:25%;background:linear-gradient(180deg,#6b6b80,rgba(107,107,128,0.1))" data-val="Sun: 8"></div>
+        <span class="text-xs text-gray-600">Sun</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 15: FORECAST
+     ============================================================ -->
+<section id="forecastSection" class="section-panel" style="display:none;padding:40px">
+  <div class="section-eyebrow">📈 Revenue Intelligence</div>
+  <h2 class="text-3xl font-bold mb-2">AI Sales Forecast</h2>
+  <p class="text-gray-400 mb-8">Based on 30 outreach/day, Mumbai Restaurants campaign.</p>
+  <div class="grid gap-5" style="grid-template-columns:repeat(4,1fr);max-width:900px">
+    <div class="glass p-6 rounded-2xl text-center glow-blue">
+      <div style="font-size:36px;margin-bottom:8px">📤</div>
+      <div class="text-3xl font-black text-blue-400 counter" data-target="900">0</div>
+      <div class="text-xs text-gray-400 mt-1">Businesses/Month</div>
+      <div class="text-xs text-gray-600 mt-2">30/day × 30 days</div>
+    </div>
+    <div class="glass p-6 rounded-2xl text-center">
+      <div style="font-size:36px;margin-bottom:8px">💬</div>
+      <div class="text-3xl font-black text-emerald-400 counter" data-target="171">0</div>
+      <div class="text-xs text-gray-400 mt-1">Expected Replies</div>
+      <div class="text-xs text-gray-600 mt-2">~19% reply rate</div>
+    </div>
+    <div class="glass p-6 rounded-2xl text-center">
+      <div style="font-size:36px;margin-bottom:8px">📅</div>
+      <div class="text-3xl font-black text-amber-400 counter" data-target="36">0</div>
+      <div class="text-xs text-gray-400 mt-1">Expected Meetings</div>
+      <div class="text-xs text-gray-600 mt-2">~21% of replies</div>
+    </div>
+    <div class="glass p-6 rounded-2xl text-center glow-violet">
+      <div style="font-size:36px;margin-bottom:8px">💰</div>
+      <div class="text-3xl font-black text-violet-400">₹1.98L</div>
+      <div class="text-xs text-gray-400 mt-1">Projected Revenue</div>
+      <div class="text-xs text-gray-600 mt-2">9 clients × ₹22K avg</div>
+    </div>
+  </div>
+  <!-- Funnel visualization -->
+  <div class="glass p-6 rounded-2xl mt-6" style="max-width:700px">
+    <div class="text-sm font-semibold mb-5">Conversion Funnel</div>
+    <div class="space-y-3">
+      <div>
+        <div class="flex justify-between text-xs mb-1"><span class="text-gray-400">Businesses Reached</span><span class="text-blue-400 font-semibold">900</span></div>
+        <div class="progress-bar"><div class="progress-fill fill-blue" style="width:100%"></div></div>
+      </div>
+      <div>
+        <div class="flex justify-between text-xs mb-1"><span class="text-gray-400">Replies Received</span><span class="text-emerald-400 font-semibold">171 (19%)</span></div>
+        <div class="progress-bar"><div class="progress-fill fill-green" style="width:19%"></div></div>
+      </div>
+      <div>
+        <div class="flex justify-between text-xs mb-1"><span class="text-gray-400">Meetings Booked</span><span class="text-amber-400 font-semibold">36 (4%)</span></div>
+        <div class="progress-bar"><div class="progress-fill fill-amber" style="width:4%"></div></div>
+      </div>
+      <div>
+        <div class="flex justify-between text-xs mb-1"><span class="text-gray-400">Clients Closed</span><span style="color:#fb7185" class="font-semibold">9 (1%)</span></div>
+        <div class="progress-bar"><div class="progress-fill fill-rose" style="width:1%"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SECTION 17/18: CAMPAIGN CONTROL CENTER
+     ============================================================ -->
+<section id="controlSection" class="section-panel" style="display:none;padding:40px">
+  <div class="section-eyebrow">🚀 Command Center</div>
+  <h2 class="text-3xl font-bold mb-8">Autonomous Campaign Control</h2>
+  <div class="grid gap-6" style="grid-template-columns:1fr 1fr;max-width:1000px">
+    <div class="glass p-6 rounded-2xl" style="border-color:rgba(59,130,246,0.3)">
+      <div class="text-sm font-semibold mb-4 text-gray-300">Active Campaign</div>
+      <div class="space-y-3">
+        <div class="flex justify-between items-center">
+          <span class="text-xs text-gray-500">Industry</span>
+          <span class="text-sm font-medium">🍽 Restaurants</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-xs text-gray-500">Location</span>
+          <span class="text-sm font-medium">Mumbai, Maharashtra</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-xs text-gray-500">Channels</span>
+          <span class="text-sm">📱 WhatsApp &nbsp; 📧 Gmail</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-xs text-gray-500">Daily Outreach</span>
+          <span class="text-sm font-bold text-blue-400">30 Businesses</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-xs text-gray-500">Status</span>
+          <span class="badge badge-green flex items-center gap-1.5"><span class="status-dot dot-green"></span>Running</span>
+        </div>
+      </div>
+      <div class="border-t border-gray-800 my-4"></div>
+      <div class="space-y-3">
+        <div class="flex justify-between items-center">
+          <span class="text-xs text-gray-500">Leads Found</span>
+          <span class="text-sm font-bold text-emerald-400">154</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-xs text-gray-500">Messages Generated</span>
+          <span class="text-sm font-bold text-blue-400">154</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-xs text-gray-500">Scheduled Today</span>
+          <span class="text-sm font-bold text-violet-400">30</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-xs text-gray-500">Replies</span>
+          <span class="text-sm font-bold text-amber-400">8</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-xs text-gray-500">Meetings</span>
+          <span class="text-sm font-bold text-rose-400">2</span>
+        </div>
+        <div class="flex justify-between items-center">
+          <span class="text-xs text-gray-500">Projected Revenue</span>
+          <span class="text-lg font-black grad-text">₹66,000</span>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-col gap-4">
+      <button class="btn-primary" style="padding:20px;font-size:16px;border-radius:16px" onclick="startCampaign()">
+        ⚡ Launch New Campaign
+      </button>
+      <button class="btn-secondary" style="padding:16px;font-size:14px;border-radius:16px">
+        ⏸ Pause Current Campaign
+      </button>
+      <div class="glass p-5 rounded-2xl">
+        <div class="text-sm font-semibold mb-3">Next 24h Automation</div>
+        <div class="space-y-2">
+          <div class="flex items-center gap-3 text-xs">
+            <span class="badge badge-green">9:00 AM</span>
+            <span class="text-gray-300">Send 10 WhatsApp messages</span>
+          </div>
+          <div class="flex items-center gap-3 text-xs">
+            <span class="badge badge-blue" style="background:rgba(59,130,246,0.2);color:#93c5fd;border:1px solid rgba(59,130,246,0.3)">11:00 AM</span>
+            <span class="text-gray-300">Send 10 follow-up emails</span>
+          </div>
+          <div class="flex items-center gap-3 text-xs">
+            <span class="badge badge-violet">2:00 PM</span>
+            <span class="text-gray-300">Scan 50 new businesses</span>
+          </div>
+          <div class="flex items-center gap-3 text-xs">
+            <span class="badge badge-warm">4:00 PM</span>
+            <span class="text-gray-300">Send 10 final messages</span>
+          </div>
+          <div class="flex items-center gap-3 text-xs">
+            <span class="badge badge-green">6:00 PM</span>
+            <span class="text-gray-300">Generate tomorrow's list</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PORTFOLIO SECTION
+     ============================================================ -->
+<section id="portfolioSection" class="section-panel" style="display:none;padding:40px">
+  <div class="section-eyebrow">🎨 Your Work</div>
+  <h2 class="text-3xl font-bold mb-8">Portfolio</h2>
+  <div class="glass p-8 rounded-2xl" style="max-width:700px">
+    <div class="flex items-start gap-6 mb-6">
+      <div style="width:80px;height:80px;background:linear-gradient(135deg,#3b82f6,#8b5cf6);border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:32px">👨‍💻</div>
+      <div>
+        <h3 class="text-xl font-bold" id="portName">Arjun Sharma</h3>
+        <div class="text-gray-400 text-sm" id="portBiz">Arjun Dev Studio</div>
+        <div class="flex gap-2 mt-2">
+          <span class="badge badge-violet">Web Developer</span>
+          <span class="badge badge-green">SEO Expert</span>
+          <span class="badge badge-blue" style="background:rgba(59,130,246,0.2);color:#93c5fd;border:1px solid rgba(59,130,246,0.3)">UI/UX</span>
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-3 gap-4 mb-6">
+      <div class="glass p-4 rounded-xl text-center">
+        <div class="text-2xl font-bold text-blue-400">47+</div>
+        <div class="text-xs text-gray-500">Projects Done</div>
+      </div>
+      <div class="glass p-4 rounded-xl text-center">
+        <div class="text-2xl font-bold text-emerald-400">4.9★</div>
+        <div class="text-xs text-gray-500">Client Rating</div>
+      </div>
+      <div class="glass p-4 rounded-xl text-center">
+        <div class="text-2xl font-bold text-amber-400">5yr</div>
+        <div class="text-xs text-gray-500">Experience</div>
+      </div>
+    </div>
+    <div class="mb-4 text-xs text-gray-400">Portfolio URL</div>
+    <div class="flex gap-3">
+      <div class="glass flex-1 px-4 py-3 rounded-xl text-sm text-blue-400" id="portUrl">https://chrollo1754.github.io/portf/</div>
+      <a href="https://chrollo1754.github.io/portf/" target="_blank" class="btn-primary btn-sm">View Portfolio →</a>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section id="featuresSection" class="section-panel" style="display:none;padding:40px">
+  <div class="section-eyebrow">✨ Platform</div>
+  <h2 class="text-3xl font-bold mb-8">Premium Features</h2>
+  <div class="grid gap-4" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr));max-width:1000px" id="featuresGrid"></div>
+</section>
+
+</div><!-- /main-content -->
+
+<style>
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+@keyframes slideIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.slide-in{animation:slideIn 0.4s ease forwards}
+</style>
+
+<script>
+// ============================================================
+// DATA
+// ============================================================
+
+const LEADS = [
+  {id:1,name:"Spice Garden Restaurant",industry:"Restaurant",location:"Bandra West, Mumbai",website:"spicegarden.in",rating:4.1,reviews:89,social:true,score:87,status:"hot",phone:"+91 98234 11234"},
+  {id:2,name:"The Brew House Cafe",industry:"Cafe",location:"Andheri East, Mumbai",website:"brewhousemumbai.com",rating:3.8,reviews:212,social:false,score:74,status:"hot",phone:"+91 98112 44567"},
+  {id:3,name:"Glamour Touch Salon",industry:"Salon",location:"Juhu, Mumbai",website:"glamourtouchsalon.in",rating:4.5,reviews:156,social:true,score:62,status:"warm",phone:"+91 99881 23456"},
+  {id:4,name:"Dr. Mehta Dental Clinic",industry:"Dental",location:"Borivali West, Mumbai",website:"drmehtadental.com",rating:4.7,reviews:43,social:false,score:91,status:"hot",phone:"+91 98765 34512"},
+  {id:5,name:"Iron Body Gym",industry:"Gym",location:"Malad, Mumbai",website:"",rating:4.2,reviews:178,social:true,score:55,status:"warm",phone:"+91 97654 78901"},
+  {id:6,name:"Sunrise Bakery",industry:"Bakery",location:"Kurla, Mumbai",website:"",rating:4.6,reviews:94,social:false,score:48,status:"cold",phone:"+91 98876 45123"},
+  {id:7,name:"FashionFirst Boutique",industry:"Retail",location:"Colaba, Mumbai",website:"fashionfirstmumbai.com",rating:3.9,reviews:67,social:true,score:71,status:"warm",phone:"+91 99234 56789"},
+  {id:8,name:"Sharma & Associates Law",industry:"Law Firm",location:"Fort, Mumbai",website:"sharmalaw.in",rating:4.3,reviews:28,social:false,score:83,status:"hot",phone:"+91 98543 21234"},
+  {id:9,name:"City Motors Garage",industry:"Automotive",location:"Goregaon, Mumbai",website:"",rating:4.0,reviews:189,social:false,score:42,status:"cold",phone:"+91 97123 98765"},
+  {id:10,name:"Hotel Royal Inn",industry:"Hospitality",location:"Dadar, Mumbai",website:"royalinnmumbai.com",rating:3.7,reviews:301,social:true,score:78,status:"warm",phone:"+91 98654 32109"},
+  {id:11,name:"Bright Minds Coaching",industry:"Education",location:"Thane, Mumbai",website:"",rating:4.8,reviews:56,social:true,score:88,status:"hot",phone:"+91 99345 67890"},
+  {id:12,name:"Dr. Patel Eye Care",industry:"Medical",location:"Powai, Mumbai",website:"pateleye.com",rating:4.6,reviews:82,social:false,score:80,status:"hot",phone:"+91 98901 23456"},
+  {id:13,name:"Green Leaf Organics",industry:"Retail",location:"Bandra East, Mumbai",website:"",rating:4.4,reviews:134,social:true,score:66,status:"warm",phone:"+91 97890 11234"},
+  {id:14,name:"Techfix Repairs",industry:"Electronics",location:"Kandivali, Mumbai",website:"techfixmumbai.in",rating:3.9,reviews:203,social:false,score:53,status:"cold",phone:"+91 98234 77890"},
+  {id:15,name:"Casa Bella Events",industry:"Events",location:"Worli, Mumbai",website:"casabellaevents.com",rating:4.9,reviews:47,social:true,score:92,status:"hot",phone:"+91 99012 34567"},
+  {id:16,name:"Mumbai Bites Tiffin",industry:"Food Delivery",location:"Ghatkopar, Mumbai",website:"",rating:4.3,reviews:267,social:true,score:61,status:"warm",phone:"+91 98765 01234"},
+  {id:17,name:"Pristine Skin Clinic",industry:"Dermatology",location:"Santacruz, Mumbai",website:"pristineskin.in",rating:4.7,reviews:91,social:true,score:85,status:"hot",phone:"+91 97654 89012"},
+];
+
+const AUDIT_DATA = {
+  87:{quality:45,seo:38,speed:52,trust:60,mobile:40,issues:["Outdated website design","No SSL certificate","Missing booking system","Poor mobile experience","No WhatsApp integration"]},
+  74:{quality:62,seo:55,speed:71,trust:68,mobile:58,issues:["No online ordering","Weak SEO keywords","Missing Google Schema","No customer reviews widget"]},
+  62:{quality:70,seo:48,speed:63,trust:72,mobile:55,issues:["No booking system","Weak Instagram presence","Missing payment gateway","No newsletter signup"]},
+  91:{quality:38,seo:30,speed:44,trust:55,mobile:35,issues:["Very outdated website","No patient portal","Missing SSL","No online appointments","Slow loading (8.2s)","No mobile optimization"]},
+  55:{quality:0,seo:0,speed:0,trust:20,mobile:0,issues:["No website at all","Missing Google Business listing","No online presence","Cannot be found online","Zero digital footprint"]},
+};
+
+const FEATURES = [
+  {icon:"🔍",title:"AI Lead Discovery",desc:"Automatically finds local businesses that need websites using Google, Maps, and social signals."},
+  {icon:"🔬",title:"AI Website Scanner",desc:"Scans every lead's website for issues: speed, SEO, mobile-friendliness, SSL, and UX gaps."},
+  {icon:"⭐",title:"AI Lead Scoring",desc:"Ranks every lead 0–100 based on revenue potential, website quality, and fit score."},
+  {icon:"💰",title:"AI Pricing Intelligence",desc:"Suggests the right pricing for each lead based on local market rates and business size."},
+  {icon:"✍",title:"AI Outreach Writer",desc:"Generates hyper-personalized WhatsApp, email, and Instagram messages for every lead."},
+  {icon:"🔁",title:"AI Follow-Up Engine",desc:"Automates a 4-touch follow-up sequence over 14 days with smart timing."},
+  {icon:"🏆",title:"Competitor Analysis",desc:"Compares each lead's site against their top 3 competitors to find your pitch angle."},
+  {icon:"📄",title:"Proposal Generator",desc:"Creates professional, branded proposals in seconds with scope, timeline, and pricing."},
+  {icon:"📋",title:"CRM Pipeline",desc:"Kanban board to manage all leads through 7 stages from discovery to closed deal."},
+  {icon:"📈",title:"Sales Forecasting",desc:"Predicts monthly revenue based on outreach volume, industry, and historical conversion data."},
+  {icon:"📊",title:"Revenue Analytics",desc:"Real-time dashboard tracking all campaign metrics, reply rates, and revenue generated."},
+  {icon:"📡",title:"Multi-Channel Outreach",desc:"Orchestrates outreach across WhatsApp, Gmail, and Instagram from a single dashboard."},
+];
+
+const KANBAN_DATA = {
+  "New Leads": [{id:"k1",name:"Spice Garden Restaurant",val:"₹22,000"},{id:"k2",name:"Sunrise Bakery",val:"₹8,000"},{id:"k3",name:"Techfix Repairs",val:"₹8,000"}],
+  "Queued": [{id:"k4",name:"The Brew House Cafe",val:"₹22,000"},{id:"k5",name:"Green Leaf Organics",val:"₹15,000"}],
+  "Contacted": [{id:"k6",name:"Glamour Touch Salon",val:"₹22,000"},{id:"k7",name:"Iron Body Gym",val:"₹15,000"},{id:"k8",name:"City Motors",val:"₹8,000"}],
+  "Interested": [{id:"k9",name:"Dr. Mehta Dental",val:"₹55,000"},{id:"k10",name:"Bright Minds Coaching",val:"₹30,000"}],
+  "Meeting Booked": [{id:"k11",name:"Casa Bella Events",val:"₹55,000"},{id:"k12",name:"Dr. Patel Eye Care",val:"₹30,000"}],
+  "Proposal Sent": [{id:"k13",name:"Sharma & Associates",val:"₹22,000"}],
+  "Closed ✓": [{id:"k14",name:"Hotel Royal Inn",val:"₹30,000"},{id:"k15",name:"Pristine Skin Clinic",val:"₹55,000"}],
+};
+
+const SLIDER_VALS = [5,10,15,20,30,50];
+const SLIDER_REV = [11000,22000,33000,44000,66000,110000];
+
+// ============================================================
+// ONBOARDING
+// ============================================================
+let currentStep = 1;
+const TOTAL_STEPS = 5;
+
+function showOnboarding(){
+  document.getElementById('onboardingModal').style.display='flex';
+  currentStep=1;
+  renderStep();
+}
+
+function renderStep(){
+  // Hide all steps
+  for(let i=1;i<=TOTAL_STEPS;i++){
+    document.getElementById('step'+i).style.display='none';
+  }
+  document.getElementById('step'+currentStep).style.display='block';
+
+  // Update step dots
+  let dots='';
+  for(let i=1;i<=TOTAL_STEPS;i++){
+    dots+=`<div style="width:8px;height:8px;border-radius:50%;background:${i===currentStep?'#3b82f6':i<currentStep?'#10b981':'rgba(255,255,255,0.15)'}"></div>`;
+  }
+  document.getElementById('stepDots').innerHTML=dots;
+
+  const titles=['Welcome!','Connect Channels','Your Portfolio','Your Pricing','Campaign Defaults'];
+  document.getElementById('stepTitle').textContent=titles[currentStep-1];
+  document.getElementById('stepIndicator').textContent=`Step ${currentStep} of ${TOTAL_STEPS}`;
+
+  document.getElementById('prevBtn').style.visibility=currentStep>1?'visible':'hidden';
+  document.getElementById('nextBtn').textContent=currentStep===TOTAL_STEPS?'Launch LeadForge ⚡':'Continue →';
+}
+
+function nextStep(){
+  if(currentStep===TOTAL_STEPS){
+    saveOnboarding();
+    document.getElementById('onboardingModal').style.display='none';
+    showToast('Setup complete! LeadForge AI is ready 🚀');
+    return;
+  }
+  currentStep++;
+  renderStep();
+}
+
+function prevStep(){
+  if(currentStep>1){currentStep--;renderStep();}
+}
+
+function saveOnboarding(){
+  const data={
+    name:document.getElementById('ob_name').value,
+    biz:document.getElementById('ob_biz').value,
+    whatsapp:document.getElementById('ob_whatsapp').value,
+    gmail:document.getElementById('ob_gmail').value,
+    instagram:document.getElementById('ob_instagram').value,
+    portfolio:document.getElementById('ob_portfolio').value,
+    basic:document.getElementById('ob_basic').value,
+    business:document.getElementById('ob_business').value,
+    premium:document.getElementById('ob_premium').value,
+    area:document.getElementById('ob_area').value,
+    daily:document.getElementById('ob_daily').value,
+  };
+  localStorage.setItem('leadforge_user',JSON.stringify(data));
+  updateUIFromProfile(data);
+}
+
+function updateUIFromProfile(data){
+  if(!data)return;
+  if(document.getElementById('portName'))document.getElementById('portName').textContent=data.name||'Arjun Sharma';
+  if(document.getElementById('portBiz'))document.getElementById('portBiz').textContent=data.biz||'Arjun Dev Studio';
+  if(document.getElementById('portUrl'))document.getElementById('portUrl').textContent=data.portfolio||'https://chrollo1754.github.io/portf/';
+}
+
+// Slider in onboarding
+document.getElementById('ob_daily').addEventListener('input',function(){
+  const v=parseInt(this.value);
+  document.getElementById('ob_daily_val').textContent=v;
+  document.getElementById('ob_proj_leads').textContent=(v*30).toLocaleString();
+  document.getElementById('ob_proj_rev').textContent='₹'+((v*30*22000*0.01/100)*100|0).toLocaleString('en-IN');
+});
+
+// Portfolio preview live update
+document.getElementById('ob_portfolio').addEventListener('input',function(){
+  document.getElementById('portfolioPreviewLink').textContent=this.value;
+  document.getElementById('portfolioPreviewLink').href=this.value;
+});
+
+// ============================================================
+// SECTION NAVIGATION
+// ============================================================
+const SECTIONS = {
+  hero:'heroSection',
+  settings:'settingsSection',
+  accounts:'accountsSection',
+  discovery:'discoverySection',
+  audit:'auditSection',
+  pricing:'pricingSection',
+  outreach:'outreachSection',
+  followup:'followupSection',
+  crm:'crmSection',
+  competitor:'competitorSection',
+  proposal:'proposalSection',
+  analytics:'analyticsSection',
+  forecast:'forecastSection',
+  portfolio:'portfolioSection',
+  features:'featuresSection',
+  control:'controlSection',
+};
+
+function showSection(key){
+  Object.values(SECTIONS).forEach(id=>{
+    const el=document.getElementById(id);
+    if(el)el.style.display='none';
+  });
+  const target=document.getElementById(SECTIONS[key]);
+  if(target){
+    target.style.display='block';
+    target.classList.add('slide-in');
+  }
+
+  // Update sidebar
+  document.querySelectorAll('.sidebar-item').forEach(el=>el.classList.remove('active'));
+  const sidebarMap={hero:0,settings:1,accounts:2,discovery:3,audit:4,pricing:5,outreach:6,followup:7,crm:8,analytics:9,forecast:10,proposal:11};
+
+  // Trigger section-specific renders
+  if(key==='discovery')renderLeads();
+  if(key==='audit')renderAudit();
+  if(key==='outreach'){populateOutreachSelect();renderOutreach();}
+  if(key==='followup')renderTimeline();
+  if(key==='crm')renderKanban();
+  if(key==='competitor')renderCompetitor();
+  if(key==='proposal'){populateProposalClient();renderProposal();}
+  if(key==='features')renderFeatures();
+  if(key==='analytics'||key==='forecast'||key==='hero')animateCounters();
+
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ============================================================
+// HERO SLIDER
+// ============================================================
+function updateSlider(val){
+  const freqs=[5,10,15,20,30,50];
+  const revs=[11000,22000,33000,44000,66000,110000];
+  const v=parseInt(val);
+  document.getElementById('sliderVal').textContent=freqs[v];
+  document.getElementById('sliderMonthly').textContent='₹'+revs[v].toLocaleString('en-IN')+'/month';
+}
+
+function startCampaign(){
+  showToast('🚀 Campaign launched! AI is scanning businesses now...');
+  setTimeout(()=>showSection('discovery'),1200);
+}
+
+function showDemo(){
+  showToast('▶ Demo mode — exploring the full dashboard!');
+  setTimeout(()=>showSection('analytics'),600);
+}
+
+// ============================================================
+// LEADS GRID
+// ============================================================
+function renderLeads(){
+  const grid=document.getElementById('leadsGrid');
+  grid.innerHTML=LEADS.map(lead=>`
+    <div class="glass p-5 rounded-2xl slide-in hover:border-blue-500/30 transition-all cursor-pointer" onclick="selectLead(${lead.id})">
+      <div class="flex items-start justify-between mb-3">
+        <div>
+          <div class="font-semibold text-sm">${lead.name}</div>
+          <div class="text-xs text-gray-500 mt-0.5">${lead.industry} · ${lead.location}</div>
+        </div>
+        <span class="badge badge-${lead.status}">${lead.status.charAt(0).toUpperCase()+lead.status.slice(1)} Lead</span>
+      </div>
+      <div class="grid grid-cols-2 gap-2 mb-3 text-xs">
+        <div class="glass px-3 py-2 rounded-lg">
+          <div class="text-gray-500 mb-0.5">Website</div>
+          <div class="text-blue-400 truncate">${lead.website||'No website'}</div>
+        </div>
+        <div class="glass px-3 py-2 rounded-lg">
+          <div class="text-gray-500 mb-0.5">Google Rating</div>
+          <div class="text-amber-400">⭐ ${lead.rating} (${lead.reviews})</div>
+        </div>
+        <div class="glass px-3 py-2 rounded-lg">
+          <div class="text-gray-500 mb-0.5">Social Presence</div>
+          <div class="${lead.social?'text-emerald-400':'text-rose-400'}">${lead.social?'✓ Active':'✗ Weak'}</div>
+        </div>
+        <div class="glass px-3 py-2 rounded-lg">
+          <div class="text-gray-500 mb-0.5">Lead Score</div>
+          <div class="font-bold ${lead.score>=80?'text-emerald-400':lead.score>=60?'text-amber-400':'text-rose-400'}">${lead.score}/100</div>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <button class="btn-icon flex-1 text-center" onclick="event.stopPropagation();auditLead(${lead.id})">🔬 Audit</button>
+        <button class="btn-icon flex-1 text-center" onclick="event.stopPropagation();generateMsg(${lead.id})">✉ Message</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function refreshLeads(){showToast('🔍 Scanning for new leads...');setTimeout(()=>showToast('✓ Found 17 new businesses!'),2000);}
+function selectLead(id){const l=LEADS.find(x=>x.id===id);if(l)showToast(`Selected: ${l.name}`);}
+function auditLead(id){showSection('audit');}
+function generateMsg(id){showSection('outreach');}
+
+// ============================================================
+// AUDIT CARDS
+// ============================================================
+function renderAudit(){
+  const container=document.getElementById('auditCards');
+  container.innerHTML=LEADS.slice(0,8).map(lead=>{
+    const a=AUDIT_DATA[lead.score]||{quality:60,seo:55,speed:65,trust:70,mobile:58,issues:["Missing booking system","No WhatsApp chat","Weak SEO content"]};
+    return `
+    <div class="glass p-6 rounded-2xl slide-in">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <div class="font-semibold text-sm">${lead.name}</div>
+          <div class="text-xs text-gray-500">${lead.website||'No website'}</div>
+        </div>
+        <div class="text-2xl font-black ${a.quality>=70?'text-emerald-400':a.quality>=50?'text-amber-400':'text-rose-400'}">${a.quality}</div>
+      </div>
+      <div class="grid grid-cols-2 gap-3 mb-4">
+        ${[['SEO Score',a.seo,'fill-blue'],['Speed Score',a.speed,'fill-green'],['Trust Score',a.trust,'fill-amber'],['Mobile Score',a.mobile,'fill-rose']].map(([label,val,cls])=>`
+          <div>
+            <div class="flex justify-between text-xs mb-1"><span class="text-gray-500">${label}</span><span class="${val>=70?'text-emerald-400':val>=50?'text-amber-400':'text-rose-400'} font-semibold">${val}</span></div>
+            <div class="progress-bar"><div class="progress-fill ${cls}" style="width:${val}%"></div></div>
+          </div>
+        `).join('')}
+      </div>
+      <div class="space-y-1.5">
+        ${a.issues.map(issue=>`<div class="flex items-center gap-2 text-xs text-gray-400"><span class="text-rose-400">⚠</span>${issue}</div>`).join('')}
+      </div>
+      <div class="mt-4 p-3 rounded-xl text-xs" style="background:rgba(139,92,246,0.1);border:1px solid rgba(139,92,246,0.2)">
+        <span class="text-violet-400 font-semibold">💡 AI Recommendation: </span>
+        <span class="text-gray-400">Offer Business Website package at ₹22,000. Highlight booking system + WhatsApp integration as key pain-point solutions.</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// OUTREACH MESSAGES
+// ============================================================
+let currentChannel='whatsapp';
+let currentOutreachLead=LEADS[0];
+
+function populateOutreachSelect(){
+  const sel=document.getElementById('outreachLeadSelect');
+  sel.innerHTML=LEADS.map(l=>`<option value="${l.id}">${l.name}</option>`).join('');
+}
+
+function switchChannel(ch,btn){
+  currentChannel=ch;
+  document.querySelectorAll('#channelTabs .tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderOutreach();
+}
+
+function renderOutreach(){
+  const sel=document.getElementById('outreachLeadSelect');
+  if(!sel)return;
+  const leadId=parseInt(sel.value)||1;
+  currentOutreachLead=LEADS.find(l=>l.id===leadId)||LEADS[0];
+  const user=JSON.parse(localStorage.getItem('leadforge_user')||'{}');
+  const name=user.name||'Arjun Sharma';
+  const portfolio=user.portfolio||'https://chrollo1754.github.io/portf/';
+  const phone=user.whatsapp||'+91 98765 43210';
+  const l=currentOutreachLead;
+
+  const msgs=getMessages(l,name,portfolio,phone,currentChannel);
+  const labels=['📤 Initial Message (Day 1)','🔁 Follow-Up #1 (Day 3)','💡 Value Proposition (Day 7)','🎯 Final Follow-Up (Day 14)'];
+  const container=document.getElementById('outreachMessages');
+  container.innerHTML=msgs.map((msg,i)=>`
+    <div class="glass p-5 rounded-2xl slide-in">
+      <div class="flex items-center justify-between mb-3">
+        <span class="badge badge-violet">${labels[i]}</span>
+        <button class="btn-icon" onclick="copyMsg(this,'${btoa(encodeURIComponent(msg))}')">📋 Copy</button>
+      </div>
+      <div class="text-sm text-gray-300 leading-relaxed whitespace-pre-line p-4 rounded-xl" style="background:rgba(255,255,255,0.03);font-family:monospace;font-size:12px">${msg}</div>
+    </div>
+  `).join('');
+}
+
+function getMessages(l,name,portfolio,phone,channel){
+  const hasSite=!!l.website;
+  if(channel==='whatsapp'){
+    return [
+      `Hi! 👋 I'm ${name}, a professional web developer.\n\nI came across ${l.name} in ${l.location} and noticed ${hasSite?`your website ${l.website} has some areas that could be improved`:'you currently don\'t have a website'} — which could be costing you customers every day.\n\nI've helped 40+ local businesses in Mumbai get more leads and bookings with modern websites.\n\nWould you be open to a quick 5-minute chat this week? 🙏\n\nPortfolio: ${portfolio}\n\n— ${name}`,
+      `Hi again! 😊\n\nFollowing up on my earlier message about ${l.name}'s online presence.\n\nQuick question — how many customers do you think search online for ${l.industry.toLowerCase()} in ${l.location.split(',')[0]} every month? The answer is 2,000–5,000+ 📊\n\nI'd love to show you how to capture even 1% of those — that's 20–50 new customers/month.\n\nFree to chat? ${portfolio}\n\n— ${name} | ${phone}`,
+      `Hey! 👋\n\nI built a website last month for a ${l.industry} in Bandra — they got 18 new enquiries in the first 2 weeks! 🚀\n\nFor ${l.name}, I'd suggest:\n✅ Modern, mobile-friendly design\n✅ Online booking / enquiry system\n✅ WhatsApp chat button\n✅ Google-ready SEO\n\nAll starting at ₹8,000.\n\nWant me to send a free website mockup for ${l.name}? Takes me 30 mins.\n\n${portfolio}\n— ${name}`,
+      `Hi! Last message, I promise 😊\n\nI've been working on a free concept design for ${l.name} — it looks great!\n\nIf you're interested in growing your online presence, I'm happy to share it + give you a no-obligation quote.\n\nIf not, no worries at all — wishing ${l.name} all the best! 🙏\n\nPortfolio: ${portfolio}\n\n— ${name} | ${phone}`,
+    ];
+  }
+  if(channel==='instagram'){
+    return [
+      `Hey ${l.name}! 👋\n\nLove what you're doing in ${l.location.split(',')[0]} 🙌\n\nI'm a web developer and I noticed ${hasSite?`your site could use some love`:'you don\'t have a website yet'} — I'd love to help you get more customers online!\n\nCheck my work: ${portfolio}\n\nWould you be up for a quick DM chat? 😊`,
+      `Hi again! Just following up on my last DM 📩\n\nBuilt 3 websites for ${l.industry.toLowerCase()} businesses this month — they're all getting more bookings now 📈\n\nWould love to do the same for ${l.name}!\n\n${portfolio} — feel free to check my portfolio!`,
+      `Hey! Quick question for ${l.name} — \n\nDo you currently get enquiries from Google or Instagram? 🤔\n\nMost ${l.industry.toLowerCase()} businesses in Mumbai are missing 50–100 leads/month just from poor SEO.\n\nI can fix that! Starting from ₹8,000. Want a free site audit? 🔍`,
+      `Last follow up! 🙏\n\nI built a quick mockup for ${l.name} — genuinely looks 🔥\n\nHappy to share it free, no pressure. If you ever decide to level up your online presence, I'm here!\n\n${portfolio}\n— ${name}`,
+    ];
+  }
+  // email
+  return [
+    `Subject: Quick idea for ${l.name}'s website\n\nHi there,\n\nI'm ${name}, a web developer based in Mumbai. I came across ${l.name} while researching ${l.industry.toLowerCase()} businesses in ${l.location.split(',')[0]} and wanted to reach out.\n\n${hasSite?`I noticed your website has some opportunities for improvement that could help you attract more customers online.`:`I noticed you don't currently have a website, which means you might be missing out on customers searching for ${l.industry.toLowerCase()} in ${l.location.split(',')[0]} every day.`}\n\nI've helped 40+ local Mumbai businesses get more leads through modern, fast websites with booking systems and WhatsApp integration.\n\nWould you be open to a 15-minute call this week?\n\nBest regards,\n${name}\n${phone}\n${portfolio}`,
+    `Subject: Re: ${l.name} website — 2,000+ potential customers/month\n\nHi,\n\nFollowing up on my previous email.\n\nEvery month, 2,000–5,000+ people search for ${l.industry.toLowerCase()} in ${l.location.split(',')[0]} on Google. Without a strong online presence, these potential customers go to your competitors.\n\nI specialize in building websites that convert visitors into paying customers — with online booking, WhatsApp chat, and local SEO built in.\n\nPackages start from ₹8,000 for a basic 5-page site.\n\nWould love to discuss how I can help ${l.name} grow online.\n\nBest,\n${name} | ${phone}\n${portfolio}`,
+    `Subject: Free website mockup for ${l.name}\n\nHi,\n\nI took 30 minutes to sketch a website concept for ${l.name} — I think you'll like it.\n\nHere's what I had in mind:\n• Modern, mobile-first design\n• Online booking / enquiry form\n• WhatsApp chat widget\n• Google Maps integration\n• Local SEO setup\n\nAll for ₹22,000 — the average Mumbai restaurant using my sites sees 15–20 new enquiries/month.\n\nWant me to share the mockup?\n\n${name}\n${portfolio}`,
+    `Subject: Final note — ${l.name} website offer\n\nHi,\n\nThis is my last follow-up — I don't want to be a nuisance!\n\nMy offer: I'll build ${l.name} a professional website starting from ₹8,000, with a 30-day money-back guarantee if you're not happy.\n\nIf the timing isn't right, I completely understand. Feel free to reach out whenever you're ready.\n\nWishing ${l.name} continued success!\n\nBest,\n${name}\n${phone} | ${portfolio}`,
+  ];
+}
+
+function copyMsg(btn,encoded){
+  const text=decodeURIComponent(atob(encoded));
+  navigator.clipboard.writeText(text).catch(()=>{});
+  showToast('✓ Message copied to clipboard!');
+  btn.textContent='✓ Copied';
+  setTimeout(()=>btn.textContent='📋 Copy',2000);
+}
+
+// ============================================================
+// FOLLOW-UP TIMELINE
+// ============================================================
+function renderTimeline(){
+  const items=[
+    {day:'Day 1',title:'Initial Outreach',desc:'AI sends personalized WhatsApp + Email to the lead. Mentions business name, detected problem, and portfolio link.',icon:'📤',color:'#3b82f6'},
+    {day:'Day 3',title:'First Follow-Up',desc:'Gentle reminder with a compelling statistic about missed customers. Adds social proof from similar businesses.',icon:'🔁',color:'#8b5cf6'},
+    {day:'Day 7',title:'Value Proposition',desc:'Detailed breakdown of what a new website would do for them. Mentions specific features: booking system, WhatsApp chat.',icon:'💡',color:'#10b981'},
+    {day:'Day 14',title:'Final Outreach',desc:'Last message. Offers free mockup + money-back guarantee. Friendly close regardless of outcome.',icon:'🎯',color:'#f59e0b'},
+  ];
+  document.getElementById('timelineItems').innerHTML=items.map((item,i)=>`
+    <div class="relative mb-8 pl-6">
+      <div class="timeline-dot" style="top:8px;background:${item.color};box-shadow:0 0 12px ${item.color}"></div>
+      <div class="glass p-5 rounded-2xl ml-4">
+        <div class="flex items-center gap-3 mb-2">
+          <span style="font-size:22px">${item.icon}</span>
+          <div>
+            <div class="text-xs font-bold" style="color:${item.color}">${item.day}</div>
+            <div class="font-semibold text-sm">${item.title}</div>
+          </div>
+          <span class="badge ml-auto" style="background:${item.color}20;color:${item.color};border:1px solid ${item.color}40">Automated</span>
+        </div>
+        <p class="text-xs text-gray-400 leading-relaxed">${item.desc}</p>
+        <div class="flex gap-2 mt-3">
+          <span class="badge badge-green">WhatsApp</span>
+          <span class="badge badge-blue" style="background:rgba(59,130,246,0.2);color:#93c5fd;border:1px solid rgba(59,130,246,0.3)">Email</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// KANBAN
+// ============================================================
+let draggingCard=null;
+
+function renderKanban(){
+  const board=document.getElementById('kanbanBoard');
+  board.innerHTML=Object.entries(KANBAN_DATA).map(([col,cards])=>`
+    <div class="kanban-col" data-col="${col}" 
+         ondragover="event.preventDefault();this.classList.add('drag-over')" 
+         ondragleave="this.classList.remove('drag-over')"
+         ondrop="dropCard(event,'${col}')">
+      <div class="flex items-center justify-between mb-3">
+        <div class="text-xs font-bold text-gray-400">${col}</div>
+        <div class="text-xs text-gray-600 bg-gray-800 px-2 py-0.5 rounded-full">${cards.length}</div>
+      </div>
+      ${cards.map(card=>`
+        <div class="kanban-card" draggable="true" data-id="${card.id}"
+             ondragstart="startDrag(event,'${card.id}','${col}')"
+             ondragend="this.classList.remove('dragging')">
+          <div class="text-xs font-semibold text-gray-200 mb-1">${card.name}</div>
+          <div class="text-xs text-emerald-400 font-bold">${card.val}</div>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+function startDrag(e,id,col){
+  draggingCard={id,col};
+  e.currentTarget.classList.add('dragging');
+}
+
+function dropCard(e,targetCol){
+  e.currentTarget.classList.remove('drag-over');
+  if(!draggingCard)return;
+  const {id,col}=draggingCard;
+  if(col===targetCol)return;
+  const card=KANBAN_DATA[col].find(c=>c.id===id);
+  if(card){
+    KANBAN_DATA[col]=KANBAN_DATA[col].filter(c=>c.id!==id);
+    KANBAN_DATA[targetCol].push(card);
+    renderKanban();
+    showToast(`Moved to "${targetCol}"`);
+  }
+  draggingCard=null;
+}
+
+// ============================================================
+// COMPETITOR ANALYSIS
+// ============================================================
+function renderCompetitor(){
+  const comparisons=[
+    {lead:LEADS[0],competitors:['Zomato-listed Rival','Google Top Result','Local Favorite'],scores:[{web:45,seo:38,mobile:40,trust:60},{web:88,seo:91,mobile:85,trust:90},{web:72,seo:68,mobile:70,trust:75}]},
+    {lead:LEADS[3],competitors:['Dr. Kapoor Dental','SmilePlus Clinic','DentCare Pro'],scores:[{web:38,seo:30,mobile:35,trust:55},{web:82,seo:85,mobile:80,trust:88},{web:70,seo:65,mobile:68,trust:72}]},
+    {lead:LEADS[10],competitors:['BrightFuture Academy','StudySmart','Excellence Coaching'],scores:[{web:0,seo:0,mobile:0,trust:20},{web:78,seo:72,mobile:75,trust:80},{web:65,seo:60,mobile:62,trust:68}]},
+  ];
+  document.getElementById('competitorCards').innerHTML=comparisons.map(c=>`
+    <div class="glass p-6 rounded-2xl slide-in">
+      <div class="font-semibold mb-1">${c.lead.name}</div>
+      <div class="text-xs text-gray-500 mb-4">${c.lead.industry}</div>
+      <div class="space-y-3">
+        ${['Website Quality','SEO Score','Mobile Experience','Trust Signals'].map((metric,mi)=>{
+          const leadVal=[c.lead.score*0.5,c.lead.score*0.4,c.lead.score*0.45,c.lead.score*0.65].map(v=>Math.round(v))[mi];
+          return `
+          <div>
+            <div class="text-xs text-gray-500 mb-1.5">${metric}</div>
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-2">
+                <span class="text-xs text-gray-400 w-32 truncate">Your client</span>
+                <div class="flex-1 progress-bar"><div class="progress-fill fill-rose" style="width:${leadVal}%"></div></div>
+                <span class="text-xs text-rose-400 w-6">${leadVal}</span>
+              </div>
+              ${c.competitors.slice(0,2).map((comp,ci)=>{
+                const v=Object.values(c.scores[ci+1])[mi];
+                return `<div class="flex items-center gap-2">
+                  <span class="text-xs text-gray-600 w-32 truncate">${comp}</span>
+                  <div class="flex-1 progress-bar"><div class="progress-fill fill-blue" style="width:${v}%"></div></div>
+                  <span class="text-xs text-blue-400 w-6">${v}</span>
+                </div>`;
+              }).join('')}
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="mt-4 p-3 rounded-xl text-xs" style="background:rgba(244,63,94,0.08);border:1px solid rgba(244,63,94,0.2)">
+        <span class="text-rose-400 font-semibold">📊 Gap: </span>
+        <span class="text-gray-400">${c.lead.name} scores 40–50 points below top competitors. A new website could close this gap within 30 days.</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// PROPOSAL GENERATOR
+// ============================================================
+function populateProposalClient(){
+  const sel=document.getElementById('proposalClient');
+  if(!sel.options.length)
+    sel.innerHTML=LEADS.map(l=>`<option value="${l.id}">${l.name}</option>`).join('');
+}
+
+function renderProposal(){
+  const sel=document.getElementById('proposalClient');
+  if(!sel)return;
+  const lead=LEADS.find(l=>l.id===parseInt(sel.value))||LEADS[0];
+  const pkg=document.getElementById('proposalPackage')?.value||'business';
+  const weeks=document.getElementById('proposalTimeline')?.value||'2';
+  const prices={basic:'₹8,000',business:'₹22,000',premium:'₹55,000'};
+  const pkgNames={basic:'Basic Website',business:'Business Website',premium:'Premium Website'};
+  const user=JSON.parse(localStorage.getItem('leadforge_user')||'{}');
+  const devName=user.name||'Arjun Sharma';
+
+  document.getElementById('proposalPreview').innerHTML=`
+    <div style="border-bottom:1px solid rgba(255,255,255,0.08);padding-bottom:16px;margin-bottom:16px">
+      <div class="grad-text font-black text-lg">Website Development Proposal</div>
+      <div class="text-xs text-gray-500 mt-1">Prepared by ${devName} · ${new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}</div>
+    </div>
+    <div class="font-semibold mb-1">For: ${lead.name}</div>
+    <div class="text-xs text-gray-400 mb-4">${lead.location}</div>
+
+    <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Project Scope</div>
+    <div class="text-xs text-gray-300 mb-4 space-y-1">
+      ${pkg==='basic'?`<div>• 5-page responsive website</div><div>• Contact form & Google Maps</div><div>• Mobile-first design</div><div>• Basic SEO setup</div>`:
+        pkg==='business'?`<div>• 8-page CMS-powered website</div><div>• Online booking system</div><div>• WhatsApp chat widget</div><div>• Blog / news section</div><div>• Lead capture forms</div><div>• Local SEO optimization</div>`:
+        `<div>• 15+ pages custom website</div><div>• Payment gateway integration</div><div>• CRM lead management</div><div>• Custom animations</div><div>• Analytics dashboard</div><div>• Advanced SEO & schema</div>`}
+    </div>
+
+    <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Timeline</div>
+    <div class="text-xs text-gray-300 mb-4">${weeks} week${weeks>1?'s':''} from project kickoff</div>
+
+    <div class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Deliverables</div>
+    <div class="text-xs text-gray-300 mb-4 space-y-1">
+      <div>• Source files & design assets</div>
+      <div>• 30-day post-launch support</div>
+      <div>• Training session (1 hour)</div>
+      <div>• Hosting setup assistance</div>
+    </div>
+
+    <div class="p-3 rounded-xl text-center mt-2" style="background:linear-gradient(135deg,rgba(59,130,246,0.15),rgba(139,92,246,0.15));border:1px solid rgba(139,92,246,0.3)">
+      <div class="text-xs text-gray-400 mb-1">${pkgNames[pkg]} Investment</div>
+      <div class="text-2xl font-black grad-text">${prices[pkg]}</div>
+      <div class="text-xs text-gray-500 mt-1">30-day money-back guarantee</div>
+    </div>
+    <button class="btn-primary w-full mt-4 text-xs" style="padding:10px">📞 Book a Free Call with ${devName}</button>
+  `;
+}
+
+function exportProposal(){showToast('📥 Proposal exported as PDF!');}
+
+// ============================================================
+// FEATURES GRID
+// ============================================================
+function renderFeatures(){
+  document.getElementById('featuresGrid').innerHTML=FEATURES.map(f=>`
+    <div class="glass p-5 rounded-2xl hover:border-blue-500/30 transition-all slide-in">
+      <div style="font-size:28px;margin-bottom:10px">${f.icon}</div>
+      <div class="font-semibold text-sm mb-2">${f.title}</div>
+      <div class="text-xs text-gray-400 leading-relaxed">${f.desc}</div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// ANIMATED COUNTERS
+// ============================================================
+function animateCounters(){
+  document.querySelectorAll('.counter[data-target]').forEach(el=>{
+    const target=parseInt(el.dataset.target);
+    let current=0;
+    const step=Math.ceil(target/60);
+    const timer=setInterval(()=>{
+      current=Math.min(current+step,target);
+      el.textContent=current.toLocaleString();
+      if(current>=target)clearInterval(timer);
+    },16);
+  });
+}
+
+// ============================================================
+// TABS
+// ============================================================
+function selectTab(btn){
+  const parent=btn.parentElement;
+  parent.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg){
+  const t=document.getElementById('toast');
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded',()=>{
+  const saved=localStorage.getItem('leadforge_user');
+  if(!saved){
+    showOnboarding();
+  } else {
+    updateUIFromProfile(JSON.parse(saved));
+  }
+  animateCounters();
+  showSection('hero');
+
+  // Sidebar active state
+  document.querySelectorAll('.sidebar-item').forEach(item=>{
+    item.addEventListener('click',function(){
+      document.querySelectorAll('.sidebar-item').forEach(i=>i.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+});
+</script>
+</body>
+</html>
